@@ -1,0 +1,320 @@
+```
+
+
+#include<bits/stdc++.h>
+
+using namespace std;
+#define int long long
+#define vii vector<pii>
+#define ld long double
+#define pii pair<int,int>
+#define FOR(i,a,b)        for(int i=a;i<b;i++)
+#define ROF(i,a,b)        for(int i=a;i>=b;i--)
+#define sp(x,y)           fixed<<setprecision(y)<<x
+#define inf 1e18
+#define pb                push_back
+#define in(arr,n)         for(int i=0;i<n;i++){cin>>arr[i];}
+#define in1(arr,n)        for(int i=1;i<=n;i++){cin>>arr[i];}
+#define endl "\n"
+#define show(x)           cout<<x<<endl;
+#define nl                "\n";
+#define showl(x)          cout<<x<<" ";
+#define debug1(i,n,arr)        for(int i=0;i<n;i++){cout<<arr[i]<<" ";}cout<<endl;
+#define debug2(i,j,n,m,arr)   for(int i=0;i<n;i++){for(int j=0;j<m;j++){cout<<arr[i][j]<<" ";}cout<<endl;}
+//priority_queue<pii,vector<pii>,greater<pii>> s;
+const int mod=1e9+7;
+const int m1 = 1000000123;
+const int m2 = 1000000321;
+//priority_queue<pii,vector<pii>,greater<pii>> pq;
+
+
+//////////////////////   MOD OPERATIONS ////////////////////////////////
+inline int modMul(int a, int b) {  return ((a%mod) *(b%mod)) % mod; }
+inline int modAdd(int a, int b) {return ((a%mod)+(b%mod)) % mod; }
+inline int modPow(int  b, int p) { int r = 1; while (p>0) { if (p & 1) r = modMul(r, b); b = modMul(b, b); p >>= 1; } return r; }
+inline int modInverse(int a,int p) { return modPow(a, p- 2); }
+//inline int modDiv(int a, int b) { return modMul(a, modInverse(b)); }
+
+
+#define fast ios::sync_with_stdio(false);cin.tie(NULL);
+int const maxn=5*1e5+1;
+int const LN=31;
+//int fact[1000006];
+//int inv[1000006];
+//bool prime[100001];
+
+
+int dx[]={0,0,-1,1};
+int dy[]={1,-1,0,0};
+
+
+///////////////////////  binary exponentiation //////////////////
+
+
+///////////////////////  binary exponentiation //////////////////
+
+
+int bin_power(int n,int x){
+
+    int res=1;
+    //if want the ans in double then don't forget to change the res to double.
+    if(x==0){
+        return res;
+    }
+
+    while(x>1){
+        if(x%2==0){
+            x=x/2;
+            n=modMul(n,n);
+        }
+        else{
+            x--;
+            res=modMul(res,n);
+        }
+    }
+    return modMul(res,n);
+}
+
+int ncr(int n,int r){
+    int res=1;
+    for(int i=1;i<=r;i++){
+        res=res*(n-r+i)/i;
+    }
+    return (int)res;
+}
+
+int fact(int n){
+
+    int ans=0;
+    for(int i=1;i<=n;i++){
+
+        int y=n-i+1;
+        if(y>0){
+            ans=ans+y;
+        }
+    }
+    return ans;
+
+}
+
+
+
+//**************************************************************************************************************************************************//
+//*************************************         auxilary space arrays             *****************************************************************//
+
+
+
+//vector<int> adj[maxn];
+//vector<pair<int,int>> edges;
+//bool visited[maxn];
+//vector<int> par;
+//int color[maxn];
+//bool valid=true;
+//vector<vector<int>> v(maxn,vector<int> (maxn,0));
+
+
+//-------------------------------- main code starts here --------------------------------------------------------------------------------------------//
+
+vector<int> adj[maxn];
+vector<int> flat;
+int sub[maxn];
+int index[maxn];
+
+void dfs(int u,int p){
+
+    sub[u]=1;
+    flat.push_back(u);
+    for(int v:adj[u]){
+        if(v==p)continue;
+        dfs(v,u);
+        sub[u]+=sub[v];
+    }
+}
+
+
+class SGTree{
+
+    vector<int> seg,lazy;
+public:
+    SGTree(int n){
+        seg.resize(4*n+1);
+        lazy.resize(4*n+1);
+    }
+public:
+    void build(int ind,int low,int high,int arr[]){
+
+        if(low==high){
+            seg[ind]=arr[low];return;
+        }
+
+        int mid=low+(high-low)/2;
+        build(2*ind+1,low,mid,arr);
+        build(2*ind+2,mid+1,high,arr);
+
+        seg[ind]=seg[2*ind+1] + seg[2*ind+2];
+    }
+
+
+    int query(int ind,int low,int high,int l,int r){
+
+        if(lazy[ind]!=0){
+            seg[ind]=high-low+1-seg[ind];
+            lazy[ind]=0;
+
+
+
+            if(low!=high ){
+                lazy[2*ind+1]^=1;
+                lazy[2*ind+2]^=1;
+            }
+
+
+        }
+
+
+        // low high l r || l r low high
+        if(l>high || r<low){
+            return 0;
+        }
+
+        //l low high r
+        if(low>=l && high<=r){
+            return seg[ind];
+        }
+
+        int mid=low+(high-low)/2;
+        int left=query(2*ind+1,low,mid,l,r);
+        int right=query(2*ind+2,mid+1,high,l,r);
+
+        return left+right;
+
+    }
+
+
+
+    void update(int ind ,int low,int high,int l,int r,int val){
+
+        if(lazy[ind]!=0){
+            lazy[ind]=0;
+            seg[ind]=high-low+1-seg[ind];
+
+            if(low!=high){
+                lazy[2*ind+1]^=1;
+                lazy[2*ind+2]^=1;
+            }
+        }
+
+        //low high l r || l r low high
+        if(high<l || r<low){
+            return ;
+        }
+
+        //l low high r
+        if(low>=l && high<=r){
+            seg[ind]=high-low+1-seg[ind];
+
+            if(low!=high){
+                lazy[2*ind+1]^=1;
+                lazy[2*ind+2]^=1;
+
+            }
+            return;
+        }
+
+        int mid=low+(high-low)/2;
+
+        update(2*ind+1,low,mid,l,r,val);
+        update(2*ind+2,mid+1,high,l,r,val);
+
+        seg[ind]=seg[2*ind+1]+seg[2*ind+2];
+    }
+
+
+};
+
+void solve(){
+
+    int n;cin>>n;
+    FOR(i,0,n-1){
+        int a,b;cin>>a>>b;
+        adj[a].push_back(b);
+        adj[b].push_back(a);
+    }
+
+    dfs(1,1);
+    for(int i=0;i<n;i++){
+        int x=flat[i];
+        index[x]=i;
+    }
+
+    //black=0;white=1;
+    int arr[n+1];
+    memset(arr,0,sizeof arr);
+
+    SGTree segmentTree(n);
+    segmentTree.build(0,0,n-1,arr);
+    int q;cin>>q;
+    while(q--){
+        int t;cin>>t;
+        if(t==1){
+            int a,b;cin>>a>>b;
+            if(sub[a]>sub[b]){
+                swap(a,b);
+            }
+            int subtree_size_a=sub[a];
+            int index_a=index[a];
+            int total_whites_in_a=segmentTree.query(0,0,n-1,index_a,index_a+subtree_size_a-1);
+            int total_blacks_in_a=subtree_size_a-total_whites_in_a;
+
+
+            int overall_whites=segmentTree.query(0,0,n-1,index[1],index[1]+sub[1]-1);
+            int overall_blacks=n-overall_whites;
+            int total_blacks_in_b=overall_blacks-total_blacks_in_a;
+
+
+            int ans=total_blacks_in_a*total_blacks_in_b;
+            show(ans);
+
+
+        }
+        else{
+            int u;cin>>u;
+            int index_u=index[u];
+            if(arr[index_u]==1){
+                segmentTree.update(0,0,n-1,index_u,index_u+sub[u]-1,-1);
+            }
+            else{
+                segmentTree.update(0,0,n-1,index_u,index_u+sub[u]-1,1);
+            }
+        }
+    }
+}
+
+
+
+int32_t main()
+{
+
+//    freopen("input.txt", "r", stdin);
+//    freopen("output.txt","w",stdout);
+    fast
+    int test;test=1;
+
+
+    //cal();
+    //pre();
+    //cin>>test;
+    //cout<<"hre "<<endl;
+
+    while(test--){
+        solve();
+
+
+    }
+
+
+    return 0;
+}
+
+
+```
