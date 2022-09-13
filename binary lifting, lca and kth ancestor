@@ -1,0 +1,247 @@
+
+
+#include<bits/stdc++.h>
+
+using namespace std;
+#define int long long
+#define vii vector<pii>
+#define ld long double
+#define pii pair<int,int>
+#define FOR(i,a,b)        for(int i=a;i<b;i++)
+#define ROF(i,a,b)        for(int i=a;i>=b;i--)
+#define sp(x,y)           fixed<<setprecision(y)<<x
+#define inf 1e18
+#define pb                push_back
+#define in(arr,n)         for(int i=0;i<n;i++){cin>>arr[i];}
+#define in1(arr,n)        for(int i=1;i<=n;i++){cin>>arr[i];}
+#define endl "\n"
+#define show(x)           cout<<x<<endl;
+#define nl                "\n";
+#define showl(x)          cout<<x<<" ";
+#define debug1(i,n,arr)        for(int i=0;i<n;i++){cout<<arr[i]<<" ";}cout<<endl;
+#define debug2(i,j,n,m,arr)   for(int i=0;i<n;i++){for(int j=0;j<m;j++){cout<<arr[i][j]<<" ";}cout<<endl;}
+//priority_queue<pii,vector<pii>,greater<pii>> s;
+const int mod=1e9+7;
+const int m1 = 1000000123;
+const int m2 = 1000000321;
+//priority_queue<pii,vector<pii>,greater<pii>> pq;
+
+
+//////////////////////   MOD OPERATIONS ////////////////////////////////
+inline int modMul(int a, int b) {  return ((a%mod) *(b%mod)) % mod; }
+inline int modAdd(int a, int b) {return ((a%mod)+(b%mod)) % mod; }
+inline int modPow(int  b, int p) { int r = 1; while (p>0) { if (p & 1) r = modMul(r, b); b = modMul(b, b); p >>= 1; } return r; }
+inline int modInverse(int a,int p) { return modPow(a, p- 2); }
+//inline int modDiv(int a, int b) { return modMul(a, modInverse(b)); }
+
+
+#define fast ios::sync_with_stdio(false);cin.tie(NULL);
+int const maxn=3*1e5;
+int const LN=20;
+//int fact[1000006];
+//int inv[1000006];
+//bool prime[100001];
+
+
+int dx[]={0,0,-1,1};
+int dy[]={1,-1,0,0};
+
+
+///////////////////////  binary exponentiation //////////////////
+
+
+///////////////////////  binary exponentiation //////////////////
+
+
+int bin_power(int n,int x){
+
+    int res=1;
+    //if want the ans in double then don't forget to change the res to double.
+    if(x==0){
+        return res;
+    }
+
+    while(x>1){
+        if(x%2==0){
+            x=x/2;
+            n=modMul(n,n);
+        }
+        else{
+            x--;
+            res=modMul(res,n);
+        }
+    }
+    return modMul(res,n);
+}
+
+int ncr(int n,int r){
+    int res=1;
+    for(int i=1;i<=r;i++){
+        res=res*(n-r+i)/i;
+    }
+    return (int)res;
+}
+
+int fact(int n){
+
+    int ans=0;
+    for(int i=1;i<=n;i++){
+
+        int y=n-i+1;
+        if(y>0){
+            ans=ans+y;
+        }
+    }
+    return ans;
+
+}
+
+
+
+//**************************************************************************************************************************************************//
+//*************************************         auxilary space arrays             *****************************************************************//
+
+
+
+//vector<int> adj[maxn];
+//vector<pair<int,int>> edges;
+//bool visited[maxn];
+//vector<int> par;
+//int color[maxn];
+//bool valid=true;
+//vector<vector<int>> v(maxn,vector<int> (maxn,0));
+
+
+//-------------------------------- main code starts here --------------------------------------------------------------------------------------------//
+
+vector<int> adj[maxn];
+int tin[maxn];
+int tout[maxn];
+int up[maxn][LN];
+int timer;
+bool visited[maxn];
+void dfs(int u,int p){
+
+    visited[u]=true;
+    tin[u]=++timer;
+    up[u][0]=p;
+
+    for(int i=1;i<LN;i++){
+        up[u][i]=up[up[u][i-1]][i-1];
+
+    }
+
+    for(int v:adj[u]){
+
+        
+        if(!visited[v]){
+            dfs(v,u);
+        }
+    }
+
+    tout[u]=++timer;
+
+}
+
+bool is_ancestor(int u,int v){
+
+    return tin[u]<=tin[v] && tout[u]>=tout[v];
+
+
+}
+
+int lca(int u,int v){
+
+    if(is_ancestor(u,v)){
+        return u;
+    }
+
+    if(is_ancestor(v,u)){
+        return v;
+    }
+
+    for(int i=LN-1;i>=0;i--){
+        bool ans=is_ancestor(up[u][i],v);
+
+        if(!ans){
+            u=up[u][i];
+        }
+    }
+    return up[u][0];
+
+}
+
+int kth_ancestor(int u,int k){
+    
+    for(int i=0;i<LN;i++){
+        if(k>>i & 1){
+            u=up[u][i];
+        }
+    }
+    return u;
+}
+
+
+void solve(){
+
+    int n;cin>>n;
+    int q;cin>>q;
+
+    memset(adj,0,sizeof adj);
+//     for(int i=2;i<=n;i++){
+//         int a=i;
+//         int b;cin>>b;
+//         adj[a].push_back(b);
+//         adj[b].push_back(a);
+// //        cout<<i<<" "<<b<<endl;
+//     }
+    for(int i=1;i<=n;i++){
+        int a;cin>>a;
+        adj[i].push_back(a);
+    }
+
+    memset(tin,0,sizeof tin);
+    memset(tout,0,sizeof tout);
+    timer=0;
+    dfs(1,1);
+    for(int i=1;i<=n;i++){
+        if(!visited[i]){
+            dfs(i,adj[i][0]);
+        }
+    }
+
+
+
+    while(q--){
+        int a,k;cin>>a>>k;
+        int ans=kth_ancestor(a,k);
+        cout<<ans<<endl;
+    }
+
+}
+
+
+
+int32_t main()
+{
+
+//    freopen("input.txt", "r", stdin);
+//    freopen("output.txt","w",stdout);
+    fast
+    int test;test=1;
+
+
+    //cal();
+    //pre();
+    //cin>>test;
+    //cout<<"hre "<<endl;
+
+    while(test--){
+        solve();
+
+
+    }
+
+
+    return 0;
+}
