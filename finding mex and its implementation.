@@ -1,0 +1,226 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+#define int long long
+#define vii vector<pii>
+#define ld long double
+#define pii pair<int,int>
+#define FOR(i,a,b)        for(int i=a;i<b;i++)
+#define ROF(i,a,b)        for(int i=a;i>=b;i--)
+#define sp(x,y)           fixed<<setprecision(y)<<x
+#define inf 1e18
+#define pb                push_back
+#define in(arr,n)         for(int i=0;i<n;i++){cin>>arr[i];}
+#define in1(arr,n)        for(int i=1;i<=n;i++){cin>>arr[i];}
+#define endl "\n"
+#define show(x)           cout<<x<<endl;
+#define nl                "\n";
+#define showl(x)          cout<<x<<" ";
+#define debug1(i,n,arr)        for(int i=0;i<n;i++){cout<<arr[i]<<" ";}cout<<endl;
+#define debug2(i,j,n,m,arr)   for(int i=0;i<n;i++){for(int j=0;j<m;j++){cout<<arr[i][j]<<" ";}cout<<endl;}
+//priority_queue<pii,vector<pii>,greater<pii>> s;
+const int mod=1e9+7;
+const int m1 = 1000000123;
+const int m2 = 1000000321;
+//priority_queue<int,vector<int>,greater<int>>p;
+
+
+//////////////////////   MOD OPERATIONS ////////////////////////////////
+inline int modMul(int a, int b) {  return ((a%mod) *(b%mod)) % mod; }
+inline int modAdd(int a, int b) {return ((a%mod)+(b%mod)) % mod; }
+inline int modPow(int  b, int p) { int r = 1; while (p>0) { if (p & 1) r = modMul(r, b); b = modMul(b, b); p >>= 1; } return r; }
+inline int modInverse(int a,int p) { return modPow(a, p- 2); }
+//inline int modDiv(int a, int b) { return modMul(a, modInverse(b)); }
+
+
+#define fast ios::sync_with_stdio(false);cin.tie(NULL);
+int const maxn=1e5+5;
+int const LN=31;
+//int fact[1000006];
+//int inv[1000006];
+//bool prime[100001];
+
+
+//int dx[]={0,0,-1,1};
+//int dy[]={1,-1,0,0};
+string steps="RLUD";
+int dx[]={0,0,-1,1,-1,-1,1,1};
+int dy[]={1,-1,0,0,-1,1,-1,1};
+//int dx[]={-2,-2,-1,-1,1,1,2,2};
+//int dy[]={-1,1,-2,2,-2,2,-1,1};
+
+
+///////////////////////  binary exponentiation //////////////////
+
+
+///////////////////////  binary exponentiation //////////////////
+
+
+int bin_power(int n,int x){
+
+    int res=1;
+    //if want the ans in double then don't forget to change the res to double.
+    if(x==0){
+        return res;
+    }
+
+    while(x>1){
+        if(x%2==0){
+            x=x/2;
+            n=modMul(n,n);
+        }
+        else{
+            x--;
+            res=modMul(res,n);
+        }
+    }
+    return modMul(res,n);
+}
+
+int ncr(int n,int r){
+    int res=1;
+    for(int i=1;i<=r;i++){
+        res=res*(n-r+i)/i;
+    }
+    return (int)res;
+}
+
+//int fact(int n){
+//
+//    int ans=0;
+//    for(int i=1;i<=n;i++){
+//
+//        int y=n-i+1;
+//        if(y>0){
+//            ans=ans+y;
+//        }
+//    }
+//    return ans;
+//
+//}
+//
+int factorial(int n){
+
+    int ans=1;
+    for(int i=n;i>0;i--){
+        ans=modMul(ans,i);
+    }
+    return ans%mod;
+}
+
+
+//**************************************************************************************************************************************************//
+//*************************************         auxilary space arrays             *****************************************************************//
+
+
+
+//vector<int> adj[maxn];
+//vector<pair<int,int>> edges;
+//bool visited[maxn];
+//vector<int> par;
+//int color[maxn];
+//bool valid=true;
+//vector<vector<int>> v(maxn,vector<int> (maxn,0));
+
+/*****************************************************
+ *
+//1.DP se socho
+//2.DP se socho
+//3.DP se socho
+//graph, gcd, BS, seive
+//if NOTA,then
+//brute force hi optimal h
+//jha confusion ho number of ways me vha dp dp dp
+//kisi num x se y tak jaane ke liye by doing some operations jaisa kucch hai
+and min is written use BFS
+
+//In case of constructive
+Things may seem like difficult but think on very small aspects
+ki kaunsa cheez special hai and how the placement of some numbers ,letters affect the ans
+Always implementation will be easy and not very difficult to implement
+
+ //for an int n there are going to roughly (n^(1/3)) divisors.
+ */
+
+
+
+//-------------------------------- main code starts here --------------------------------------------------------------------------------------------//
+
+
+void solve(){
+
+    int n;cin>>n;
+    int arr[n+1];
+    in1(arr,n);
+    arr[0]=0;
+    
+    //for storing the positions of various numbers.
+    vector<vector<int>> pos(n+2);
+
+    for(int i=1;i<=n;i++){
+        int x=arr[i];
+        pos[x].pb(i);
+    }
+    
+    //for storing the max mex.
+    vector<int> v;
+
+    
+    //for finding the mex .. start mex from 0 and then increament until we find any mex value which is not in array
+    //which indirectly will be our ans..and now how we will come to know whether this value is not in array or is in array.
+    //we will use pos[mex] to find .. if pos[mex].size()>0 then it means it exists so it can't be mex so increae the value.
+    //similiary will do this until mex=n+1 bcoz if(arr[i]<=n) so mex can be n+1.
+    
+    //this code is not exact for mex but can be taken as reference.
+    for(int l=1;l<=n;l++){
+        int r=l;
+        int mex=0;
+        while(mex<=n+1){
+
+            auto it=lower_bound(pos[mex].begin(),pos[mex].end(),l);
+            if(it==pos[mex].end()){
+                break;
+            }
+            r=max(r,*it);
+            mex++;
+        }
+        l=r;
+        v.push_back(mex);
+    }
+
+    show(v.size());
+    for(int x:v){
+        showl(x);
+    }cout<<endl;
+
+}
+
+
+
+
+
+int32_t main()
+{
+
+//    freopen("input.txt", "r", stdin);
+//    freopen("output. txt","w",stdout);
+    fast
+    int test;test=1;
+
+
+    //cal();
+    //pre();
+
+    cin>>test;
+    //cout<<"hre "<<endl;
+
+
+    while(test--){
+        solve();
+
+
+    }
+
+
+    return 0;
+}
